@@ -10,6 +10,7 @@ use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -82,7 +83,12 @@ class PostController extends Controller
     {
         $post->load('user', 'category', 'tags', 'comments');
 
-        return view('pages.posts.show', compact('post'));
+        $seoDescription = Str::limit(strip_tags($post->body), 160);
+
+        return view('pages.posts.show', compact('post'))->with('seo', [
+            'title' => $post->title . ' - ' . config('app.name'),
+            'description' => $seoDescription,
+        ]);
     }
 
     public function edit(Post $post): View

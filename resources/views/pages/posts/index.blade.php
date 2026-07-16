@@ -143,7 +143,7 @@
         </div>
     @else
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative z-10">
-            @foreach($posts as $post)
+            @foreach($posts->loadCount(['comments', 'reactions']) as $post)
                 <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm shadow-md hover:shadow-red-950/20 transition-all duration-300 group">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
@@ -162,6 +162,18 @@
                         <p class="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-3">
                             {{ Str::limit($post->body, 180) }}
                         </p>
+
+                        <!-- Счётчики: комментарии и реакции -->
+                        <div class="flex items-center gap-4 pt-1 font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
+                            <span class="flex items-center gap-1">
+                                <span class="text-zinc-600">💬</span>
+                                <span>{{ $post->comments_count ?? 0 }}</span>
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="text-zinc-600">⚡</span>
+                                <span>{{ ($post->reactions_count ?? 0) > 0 ? ($post->reactions_count ?? 0) : '0' }}</span>
+                            </span>
+                        </div>
 
                         @if($post->tags->isNotEmpty())
                             <div class="flex flex-wrap gap-1 pt-1">

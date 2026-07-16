@@ -4,7 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ $post->title }} - {{ config('app.name', 'GameApp') }}</title>
+    <title>{{ $seo['title'] ?? $post->title }}</title>
+    <meta name="description" content="{{ $seo['description'] ?? '' }}">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ $seo['title'] ?? $post->title }}">
+    <meta property="og:description" content="{{ $seo['description'] ?? '' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ $seo['title'] ?? $post->title }}">
+    <meta name="twitter:description" content="{{ $seo['description'] ?? '' }}">
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
