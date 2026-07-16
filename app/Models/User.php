@@ -11,10 +11,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Reaction;
 use App\Models\CommentLike;
 use App\Models\Notification;
+use App\Models\Subscription;
+use App\Models\Achievement;
 
 /**
  * @property int $id
@@ -107,6 +110,64 @@ class User extends Authenticatable
     public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Подписки пользователя (на кого подписан).
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class, 'subscriber_id');
+    }
+
+    /**
+     * Подписчики пользователя (кто подписался на него).
+     */
+    public function subscribers(): HasMany
+    {
+        return $this->hasMany(Subscription::class, 'author_id');
+    }
+
+    /**
+     * Достижения пользователя.
+     */
+    public function achievements(): BelongsToMany
+    {
+        return $this->belongsToMany(Achievement::class, 'user_achievements');
+    }
+
+    /**
+     * Получить количество подписчиков.
+     */
+    public function subscribersCount(): int
+    {
+        return $this->subscribers()->count();
+    }
+
+    /**
+     * Проверить, подписан ли пользователь на другого.
+     */
+    public function isSubscribed(User $user): bool
+    {
+        return $this->subscriptions()->where('author_id', $user->id)->exists();
+    }
+
+    /**
+     * Подписаться на пользователя.
+     */
+    public function subscribe(User $user): void
+    {
+        if (!$this->isSubscribed($user)) {
+            $this->subscriptions()->create(['author_id' => $user->id]);
+        }
+    }
+
+    /**
+     * Отписаться от пользователя.
+     */
+    public function unsubscribe(User $user): void
+    {
+        $this->subscriptions()->where('author_id', $user->id)->delete();
     }
 
     /**

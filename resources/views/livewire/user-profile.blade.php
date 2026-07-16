@@ -38,8 +38,21 @@
                     <div class="text-lg font-bold font-mono text-green-500">{{ $stats['reactions_count'] ?? 0 }}</div>
                     <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Реакций</div>
                 </div>
+                <div class="text-center p-3 bg-zinc-950 rounded-sm border border-zinc-900/50">
+                    <div class="text-lg font-bold font-mono text-blue-500">{{ $user->subscribersCount() }}</div>
+                    <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Подписчиков</div>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <!-- Кнопка подписки -->
+        @auth
+            @if(auth()->id() !== $user->id)
+                <div class="mt-6 pt-6 border-t border-zinc-950">
+                    @livewire('toggle-subscription', ['user' => $user])
+                </div>
+            @endif
+        @endauth
 
     <!-- Вкладки -->
     <div class="border-b border-zinc-900">
