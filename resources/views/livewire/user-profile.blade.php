@@ -30,10 +30,14 @@
                 <div class="text-lg font-bold font-mono text-zinc-300">{{ $stats['comments_count'] }}</div>
                 <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Комментариев</div>
             </div>
-            <div class="text-center p-3 bg-zinc-950 rounded-sm border border-zinc-900/50">
-                <div class="text-lg font-bold font-mono text-amber-500">{{ $stats['bookmarks_count'] }}</div>
-                <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Избранного</div>
-            </div>
+                <div class="text-center p-3 bg-zinc-950 rounded-sm border border-zinc-900/50">
+                    <div class="text-lg font-bold font-mono text-amber-500">{{ $stats['bookmarks_count'] }}</div>
+                    <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Избранного</div>
+                </div>
+                <div class="text-center p-3 bg-zinc-950 rounded-sm border border-zinc-900/50">
+                    <div class="text-lg font-bold font-mono text-green-500">{{ $stats['reactions_count'] ?? 0 }}</div>
+                    <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Реакций</div>
+                </div>
         </div>
     </div>
 
@@ -51,6 +55,12 @@
                 class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'bookmarks' ? 'text-amber-500 border-b-2 border-amber-500 bg-amber-950/20' : 'text-zinc-500 hover:text-zinc-300'"
             >
                 [ Избранное ] <span class="text-zinc-600">({{ $stats['bookmarks_count'] }})</span>
+            </button>
+            <button 
+                wire:click="setActiveTab('reactions')"
+                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'reactions' ? 'text-green-500 border-b-2 border-green-500 bg-green-950/20' : 'text-zinc-500 hover:text-zinc-300'"
+            >
+                [ Реакции ] <span class="text-zinc-600">({{ $stats['reactions_count'] ?? 0 }})</span>
             </button>
         </div>
     </div>
@@ -151,6 +161,54 @@
                         </div>
                     </article>
                 @endforeach
+            </div>
+        @endif
+    @elseif($activeTab === 'reactions')
+        @if($reactions->isEmpty())
+            <div class="text-center py-16 border border-zinc-900 bg-zinc-900/20 rounded-sm">
+                <p class="text-xs font-mono uppercase tracking-widest text-zinc-500">
+                    // Вы ещё не оставили ни одной реакции.
+                </p>
+            </div>
+        @else
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                @foreach($reactions as $reaction)
+                    @php $post = $reaction->post; @endphp
+                    <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-green-900/20 hover:border-green-900/40 rounded-sm shadow-md hover:shadow-green-950/20 transition-all duration-300 group">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between font-mono text-[10px] text-green-500/60 uppercase tracking-wider">
+                                <span>{{ $reaction->isLike() ? '👍 Лайк' : '👎 Дизлайк' }}</span>
+                                <span>{{ $reaction->created_at->format('d.m.Y') }}</span>
+                            </div>
+
+                            <h2 class="text-base font-bold font-mono text-zinc-100 group-hover:text-green-500 transition-colors uppercase leading-snug">
+                                <a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+                            </h2>
+
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
+                                <span class="text-zinc-500">Автор:</span> {{ $post->user?->name ?? 'Аноним' }}
+                            </div>
+
+                            <p class="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-3">
+                                {{ Str::limit($post->body, 180) }}
+                            </p>
+                        </div>
+
+                        <div class="pt-5 border-t border-zinc-950 mt-5 flex items-center justify-between">
+                            <span class="text-[10px] font-mono text-green-600/60 uppercase tracking-widest">
+                                {{ $post->likesCount() }} 👍 / {{ $post->dislikesCount() }} 👎
+                            </span>
+                            <a href="{{ route('posts.show', $post) }}"
+                               class="text-xs font-mono font-bold text-green-500 hover:text-green-400 transition-colors uppercase tracking-wider">
+                                [ Читать ]
+                            </a>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="mt-10 pt-4 border-t border-zinc-900 font-mono text-xs [&_nav]:bg-transparent [&_a]:!bg-zinc-900 [&_a]:!border-zinc-800 [&_a]:!text-zinc-400 [&_span]:!bg-zinc-950 [&_span]:!border-zinc-800 [&_span]:!text-green-500">
+                {{ $reactions->links() }}
             </div>
         @endif
     @endif

@@ -46,8 +46,11 @@ class PostController extends Controller
 
         // Сортировка
         match ($request->input('sort', 'latest')) {
-            'popular' => $query->withCount('bookmarks')->orderBy('bookmarks_count', 'desc'),
+            'popular' => $query->withCount(['bookmarks', 'reactions' => function ($q) {
+                $q->where('type', 'like');
+            }])->orderBy('bookmarks_count', 'desc'),
             'title' => $query->orderBy('title', 'asc'),
+            'reactions' => $query->withCount('reactions')->orderBy('reactions_count', 'desc'),
             default => $query->latest(),
         };
 
@@ -85,7 +88,18 @@ class PostController extends Controller
 
         $seoDescription = Str::limit(strip_tags($post->body), 160);
 
-        return view('pages.posts.show', compact('post'))->with('seo', [
+        // Похожие посты по категории и тегам
+        $similarPosts = Post::with(['user', 'category'])
+            ->where('id', '!=', $post->id)
+            ->where('category_id', $post->category_id)
+            ->orWhereHas('tags', function ($q) use ($post) {
+                $q->whereIn('tags.id', $post->tags->pluck('id')->toArray());
+            })
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        return view('pages.posts.show', compact('post', 'similarPosts'))->with('seo', [
             'title' => $post->title . ' - ' . config('app.name'),
             'description' => $seoDescription,
         ]);

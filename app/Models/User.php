@@ -152,6 +152,7 @@ class User extends Authenticatable
             'posts_count' => $this->posts()->count(),
             'comments_count' => $this->comments()->count(),
             'bookmarks_count' => $this->bookmarks()->count(),
+            'reactions_count' => $this->reactions()->count(),
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Post;
 use App\Models\Bookmark;
+use App\Models\Reaction;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,7 +13,7 @@ class UserProfile extends Component
     use WithPagination;
 
     public \App\Models\User $user;
-    public string $activeTab = 'posts'; // posts, bookmarks
+    public string $activeTab = 'posts'; // posts, bookmarks, reactions
 
     public function mount(\App\Models\User $user): void
     {
@@ -43,6 +44,17 @@ class UserProfile extends Component
                 return $bookmark->post;
             })
             ->values();
+    }
+
+    /**
+     * Получить реакции пользователя.
+     */
+    public function getReactionsProperty()
+    {
+        return Reaction::with(['post.user', 'post.category', 'post.tags'])
+            ->where('user_id', $this->user->id)
+            ->latest()
+            ->paginate(12);
     }
 
     /**

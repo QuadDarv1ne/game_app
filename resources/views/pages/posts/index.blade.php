@@ -100,6 +100,7 @@
                     <select name="sort" class="w-full bg-zinc-950 border border-zinc-800 rounded-sm p-2.5 text-xs text-zinc-100 focus:outline-none focus:border-red-600 transition-all font-mono">
                         <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Сначала новые</option>
                         <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Популярные</option>
+                        <option value="reactions" {{ request('sort') == 'reactions' ? 'selected' : '' }}>По реакциям</option>
                         <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>По алфавиту</option>
                     </select>
                 </div>
@@ -143,7 +144,9 @@
         </div>
     @else
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative z-10">
-            @foreach($posts->loadCount(['comments', 'reactions']) as $post)
+            @foreach($posts->loadCount(['comments', 'reactions' => function ($q) {
+                $q->where('type', 'like');
+            }]) as $post)
                 <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm shadow-md hover:shadow-red-950/20 transition-all duration-300 group">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
@@ -170,8 +173,8 @@
                                 <span>{{ $post->comments_count ?? 0 }}</span>
                             </span>
                             <span class="flex items-center gap-1">
-                                <span class="text-zinc-600">⚡</span>
-                                <span>{{ ($post->reactions_count ?? 0) > 0 ? ($post->reactions_count ?? 0) : '0' }}</span>
+                                <span class="text-zinc-600">👍</span>
+                                <span>{{ $post->reactions_count ?? 0 }}</span>
                             </span>
                         </div>
 

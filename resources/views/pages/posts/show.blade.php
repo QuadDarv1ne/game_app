@@ -184,6 +184,43 @@
             </div>
         @endauth
     </section>
+
+    @if($similarPosts->isNotEmpty())
+        <section class="border-t border-zinc-900 pt-10 space-y-6 relative z-10">
+            <div class="space-y-1">
+                <h2 class="text-sm font-bold font-mono uppercase tracking-wide text-zinc-100">// Похожие публикации</h2>
+                <p class="text-xs text-zinc-500 font-sans">Другие материалы по этой теме.</p>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-3">
+                @foreach($similarPosts as $similar)
+                    <div class="p-4 bg-zinc-900 border border-zinc-800/60 rounded-sm hover:border-red-900/40 transition-all group">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase">
+                                <span>[ {{ $similar->category?->name ?? 'Без категории' }} ]</span>
+                                <span>{{ $similar->created_at->format('d.m.Y') }}</span>
+                            </div>
+
+                            <h3 class="text-xs font-bold font-mono text-zinc-100 group-hover:text-red-500 transition-colors uppercase leading-snug">
+                                <a href="{{ route('posts.show', $similar) }}">{{ $similar->title }}</a>
+                            </h3>
+
+                            <p class="text-[10px] text-zinc-400 font-sans line-clamp-2">
+                                {{ Str::limit($similar->body, 100) }}
+                            </p>
+
+                            <div class="pt-2 border-t border-zinc-950">
+                                <a href="{{ route('posts.show', $similar) }}"
+                                   class="text-[10px] font-mono font-bold text-red-500 hover:text-red-400 transition-colors uppercase tracking-wider">
+                                    [ Читать ]
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
 </main>
 
 @include('partials.footer')
