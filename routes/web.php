@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\Comment\CommentController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Post\PostController;
 use App\Livewire\ToggleBookmark;
 use App\Livewire\UserProfile;
 use Illuminate\Support\Facades\Route;
 
 // Главная страница
-Route::view('/', 'welcome')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Публичные маршруты (Доступны всем без авторизации)
 Route::get('posts', [PostController::class, 'index'])->name('posts.index');

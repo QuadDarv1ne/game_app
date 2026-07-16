@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Reaction;
+use App\Models\CommentLike;
 
 /**
  * @property int $id
@@ -89,6 +90,14 @@ class User extends Authenticatable
     public function reactions(): HasMany
     {
         return $this->hasMany(Reaction::class);
+    }
+
+    /**
+     * Лайки комментариев пользователя.
+     */
+    public function commentLikes(): HasMany
+    {
+        return $this->hasMany(CommentLike::class);
     }
 
     /**

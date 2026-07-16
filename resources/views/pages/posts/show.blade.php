@@ -21,7 +21,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-    @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white">
@@ -122,15 +121,19 @@
                             </div>
 
                             @auth
-                                @if(auth()->id() === $comment->user_id)
-                                    <form method="POST" action="{{ route('comments.destroy', $comment) }}" onsubmit="return confirm('Удалить ваше сообщение?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="opacity-0 group-hover/item:opacity-100 text-zinc-600 hover:text-red-500 transition-all cursor-pointer bg-transparent border-none uppercase text-[9px] font-mono tracking-wider">
-                                            [ Удалить ]
-                                        </button>
-                                    </form>
-                                @endif
+                                <div class="flex items-center gap-3">
+                                    @livewire('toggle-comment-like', ['comment' => $comment])
+                                    
+                                    @if(auth()->id() === $comment->user_id)
+                                        <form method="POST" action="{{ route('comments.destroy', $comment) }}" onsubmit="return confirm('Удалить ваше сообщение?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="opacity-0 group-hover/item:opacity-100 text-zinc-600 hover:text-red-500 transition-all cursor-pointer bg-transparent border-none uppercase text-[9px] font-mono tracking-wider">
+                                                [ Удалить ]
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             @endauth
                         </div>
                         <p class="text-xs text-zinc-300 font-sans leading-relaxed">

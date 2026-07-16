@@ -10,7 +10,6 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-    @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white">
@@ -41,6 +40,61 @@
             </a>
         </div>
     </div>
+
+    @if($popularPosts->isNotEmpty())
+        <section class="max-w-4xl mx-auto mt-16 relative z-10">
+            <div class="space-y-4">
+                <div class="text-center space-y-2">
+                    <p class="text-xs font-mono tracking-widest text-red-500 uppercase font-bold">// Топ публикации</p>
+                    <h2 class="text-xl font-bold font-mono uppercase tracking-wide text-zinc-100">Популярные посты</h2>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-3">
+                    @foreach($popularPosts as $post)
+                        <div class="p-5 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm transition-all group">
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase">
+                                    <span>[ {{ $post->category?->name ?? 'Без категории' }} ]</span>
+                                    <span class="text-red-500">👍 {{ $post->reactions_count }}</span>
+                                </div>
+
+                                <h3 class="text-sm font-bold font-mono text-zinc-100 group-hover:text-red-500 transition-colors uppercase leading-snug">
+                                    <a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+                                </h3>
+
+                                <div class="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
+                                    <span class="text-zinc-500">Автор:</span> {{ $post->user?->name ?? 'Аноним' }}
+                                </div>
+
+                                <div class="pt-3 border-t border-zinc-950">
+                                    <a href="{{ route('posts.show', $post) }}"
+                                       class="text-[10px] font-mono font-bold text-red-500 hover:text-red-400 transition-colors uppercase tracking-wider">
+                                        [ Читать ]
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if($popularTags->isNotEmpty())
+        <section class="max-w-4xl mx-auto mt-12 relative z-10">
+            <div class="text-center space-y-4">
+                <p class="text-xs font-mono tracking-widest text-zinc-500 uppercase font-bold">// Темы</p>
+                <div class="flex flex-wrap justify-center gap-2">
+                    @foreach($popularTags as $tag)
+                        <a href="/posts?tag_id={{ $tag->id }}"
+                           class="px-4 py-2 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm text-xs font-mono text-zinc-400 hover:text-red-400 transition-all uppercase">
+                            #{{ $tag->name }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 </main>
 
 @include('partials.footer')
