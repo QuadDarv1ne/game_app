@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Post;
+use App\Services\NotificationService;
 use Livewire\Component;
 
 class ToggleReaction extends Component
@@ -16,6 +17,8 @@ class ToggleReaction extends Component
     public int $likesCount = 0;
 
     public int $dislikesCount = 0;
+
+    protected $listeners = ['reactionSent' => '$refresh'];
 
     /**
      * Mount компонент.
@@ -42,6 +45,7 @@ class ToggleReaction extends Component
         }
 
         $user = auth()->user();
+        $service = app(NotificationService::class);
 
         if ($this->isLiked) {
             $user->removeReaction($this->post, 'like');
@@ -54,6 +58,9 @@ class ToggleReaction extends Component
                 $user->removeReaction($this->post, 'dislike');
                 $this->isDisliked = false;
             }
+            
+            // Отправляем уведомление
+            $service->postLiked($this->post, $user);
         }
 
         $this->likesCount = $this->post->likesCount();
@@ -70,6 +77,7 @@ class ToggleReaction extends Component
         }
 
         $user = auth()->user();
+        $service = app(NotificationService::class);
 
         if ($this->isDisliked) {
             $user->removeReaction($this->post, 'dislike');
@@ -82,6 +90,9 @@ class ToggleReaction extends Component
                 $user->removeReaction($this->post, 'like');
                 $this->isLiked = false;
             }
+            
+            // Отправляем уведомление
+            $service->postDisliked($this->post, $user);
         }
 
         $this->likesCount = $this->post->likesCount();

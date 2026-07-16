@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Reaction;
 use App\Models\CommentLike;
+use App\Models\Notification;
 
 /**
  * @property int $id
@@ -98,6 +99,22 @@ class User extends Authenticatable
     public function commentLikes(): HasMany
     {
         return $this->hasMany(CommentLike::class);
+    }
+
+    /**
+     * Уведомления пользователя.
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Получить непрочитанные уведомления.
+     */
+    public function unreadNotifications(): int
+    {
+        return $this->notifications()->where('is_read', false)->count();
     }
 
     /**

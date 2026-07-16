@@ -16,6 +16,13 @@
 
         <!-- ПРАВАЯ ЧАСТЬ: Навигация (Авторизация) без повторов -->
         <nav class="flex items-center gap-6 font-mono text-sm z-10">
+            @auth
+                <!-- Уведомления -->
+                <div class="relative">
+                    @livewire('notifications-panel')
+                </div>
+            @endauth
+
             @if (Route::has('login'))
                 @auth
                     <a href="{{ route('profile') }}" class="text-zinc-400 hover:text-red-500 transition-colors">
