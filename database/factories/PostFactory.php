@@ -1,0 +1,32 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\PostTag;
+use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Post>
+ */
+class PostFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'user_id' => User::factory(),
+            'category_id' => Category::factory(),
+            'title' => $this->faker->sentence(6),
+            'body' => $this->faker->paragraph(3),
+            'description' => $this->faker->paragraph(1),
+        ];
+    }
+}

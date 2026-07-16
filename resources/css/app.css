@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    /* Глобальный глубокий темный фон */
+    --color-background: #09090b; /* zinc-950 */
+    --color-foreground: #f4f4f5; /* text zinc-100 */
+
+    /* Переопределяем цвета акцентов системы на темно-красный для Flux UI */
+    --color-accent: #dc2626; /* red-600 */
+    --color-accent-content: #ffffff;
+    --color-accent-foreground: #7f1d1d; /* red-950 */
+}
+
+@layer theme {
+    /* Принудительно задаем переменные темы для Flux UI, чтобы он не брал светлые дефолты */
+    :root, .dark {
+        --flux-primary: #dc2626;
+        --flux-accent: #ef4444;
+        --flux-primary-hover: #b91c1c;
+    }
+}
+
+@layer base {
+    /* Убираем дефолтные белые/серые рамки. Задаем строгий темный цвет рамок для всех элементов */
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: #27272a !important; /* zinc-800 — идеальный контраст на черном фоне */
+    }
+
+    /* Автоматически красим тело страницы и убираем проблему белого экрана */
+    body {
+        background-color: #09090b !important;
+        color: #f4f4f5 !important;
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight !text-zinc-300 font-medium;
+}
+
+/* Строгий стиль фокуса для всех инпутов и полей Flux UI: аккуратное красное свечение */
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-red-600/40 ring-offset-0 !border-red-600;
+}
