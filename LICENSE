@@ -1,21 +1,56 @@
-MIT License
+ЛИЧНАЯ ЛИЦЕНЗИЯ
 
-Copyright (c) 2026 Дуплей Максим Игоревич
+Автор: Дуплей Максим Игоревич
+Год: 2026
+Проект: GameApp
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+---
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. АВТОРСКИЕ ПРАВА
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Все права на данный программный проект принадлежат Дуплею Максиму Игоревичу.
+Распространение, копирование, модификация и использование данного проекта 
+осуществляются исключительно с разрешения автора.
+
+2. РАЗРЕШЕНИЯ
+
+Автор предоставляет бесплатное разрешение любому лицу, получившему копию 
+данного программного обеспечения и связанных с ним файлов документации 
+(далее — «Программное обеспечение»), на использование Программного обеспечения 
+безвозмездно, включая неограниченное право на использование, копирование, 
+модификацию, слияние, публикацию, распространение и/или продажу копий 
+Программного обеспечения, при соблюдении следующих условий:
+
+- Указание авторства: при использовании данного проекта необходимо указать 
+  автора: «Дуплей Максим Игоревич, 2026»
+- Запрет на коммерческое использование без письменного согласия автора
+- Запрет на удаление данного файла лицензии из копии проекта
+
+3. ЗАПРЕТЫ
+
+Без предварительного письменного согласия автора запрещается:
+- Коммерческое использование проекта в полной или изменённой версии
+- Удаление или изменение данного файла лицензии
+- Использование имени автора для продвижения производных продуктов
+- Передача лицензии третьим лицам
+
+4. ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ
+
+ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ,
+ВЫРАЖЕННЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ, НО НЕ ОГРАНИЧИВАЯСЬ ГАРАНТИЯМИ
+КОММЕРЧЕСКОЙ ЦЕННОСТИ, СООТВЕТСТВИЯ НАЗНАЧЕНИЮ И НЕНАРУШЕНИЯ ПРАВ.
+
+НИ ПРИ КАКИХ ОБСТОЯТЕЛЬСТВАХ АВТОР НЕ НЕСЁТ ОТВЕТСТВЕННОСТИ ЗА ЛЮБЫЕ 
+ПРЕТЕНЗИИ, УБЫТКИ ИЛИ ДРУГИЕ ОБЯЗАТЕЛЬСТВА, КАК ПО ДЕЙСТВУЮЩЕМУ ДОГОВОРУ, 
+ТАК И ПО ЗАКОНУ, ВОЗНИКАЮЩИЕ ИЗ, ИЗ СОПРЯЖЁННЫЕ С ИЛИ ВЫТЕКАЮЩИЕ ИЗ 
+ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИСПОЛЬЗОВАНИЯ ИЛИ ДРУГИХ ДЕЙСТВИЙ С 
+ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ.
+
+5. КОНТАКТЫ
+
+Для получения коммерческой лицензии или разрешения на использование проекта:
+Email: [указать email]
+
+---
+
+© 2026 Дуплей Максим Игоревич. Все права защищены.
