@@ -8,9 +8,20 @@
             </div>
 
             <div class="flex-1 space-y-2">
-                <h1 class="text-xl font-bold font-mono text-zinc-100 uppercase tracking-wide">
-                    {{ $user->name }}
-                </h1>
+                <div class="flex flex-wrap items-center gap-3">
+                    <h1 class="text-xl font-bold font-mono text-zinc-100 uppercase tracking-wide">
+                        {{ $user->name }}
+                    </h1>
+
+                    @if($user->rank)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-950 border border-zinc-800 rounded-xs font-mono text-[10px] font-bold uppercase tracking-wider"
+                              style="color: {{ $user->rank->color }}">
+                            <span class="text-sm leading-none">{{ $user->rank->icon }}</span>
+                            {{ $user->rank->name }}
+                            <span class="opacity-50">Lv.{{ $user->rank->level }}</span>
+                        </span>
+                    @endif
+                </div>
                 <p class="text-xs font-mono text-zinc-500">
                     {{ $user->email }}
                 </p>
@@ -20,8 +31,25 @@
             </div>
         </div>
 
+        <!-- Прогресс до следующего ранга -->
+        @if($rankProgress['next'])
+            <div class="mt-6 space-y-2">
+                <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
+                    <span>
+                        Прогресс до звания
+                        <span class="text-zinc-300">{{ $rankProgress['next']->icon }} {{ $rankProgress['next']->name }}</span>
+                    </span>
+                    <span class="text-zinc-400">{{ $rankProgress['percent'] }}%</span>
+                </div>
+                <div class="h-1.5 bg-zinc-950 border border-zinc-900/60 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-red-700 to-red-500 transition-all duration-500"
+                         style="width: {{ $rankProgress['percent'] }}%"></div>
+                </div>
+            </div>
+        @endif
+
         <!-- Статистика -->
-        <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-zinc-950">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-6 pt-6 border-t border-zinc-950">
             <div class="text-center p-3 bg-zinc-950 rounded-sm border border-zinc-900/50">
                 <div class="text-lg font-bold font-mono text-red-500">{{ $stats['posts_count'] }}</div>
                 <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Постов</div>
@@ -59,28 +87,34 @@
         <div class="flex gap-1 font-mono text-xs">
             <button 
                 wire:click="setActiveTab('posts')"
-                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'posts' ? 'text-red-500 border-b-2 border-red-500 bg-red-950/20' : 'text-zinc-500 hover:text-zinc-300'"
+                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'posts' ? 'text-red-500 border-b-2 border-red-500 bg-red-950/20' : 'text-zinc-500 hover:text-zinc-300' }}"
             >
                 [ Посты ] <span class="text-zinc-600">({{ $stats['posts_count'] }})</span>
             </button>
             <button 
                 wire:click="setActiveTab('bookmarks')"
-                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'bookmarks' ? 'text-amber-500 border-b-2 border-amber-500 bg-amber-950/20' : 'text-zinc-500 hover:text-zinc-300'"
+                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'bookmarks' ? 'text-amber-500 border-b-2 border-amber-500 bg-amber-950/20' : 'text-zinc-500 hover:text-zinc-300' }}"
             >
                 [ Избранное ] <span class="text-zinc-600">({{ $stats['bookmarks_count'] }})</span>
             </button>
             <button 
                 wire:click="setActiveTab('reactions')"
-                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'reactions' ? 'text-green-500 border-b-2 border-green-500 bg-green-950/20' : 'text-zinc-500 hover:text-zinc-300'"
+                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'reactions' ? 'text-green-500 border-b-2 border-green-500 bg-green-950/20' : 'text-zinc-500 hover:text-zinc-300' }}"
             >
                 [ Реакции ] <span class="text-zinc-600">({{ $stats['reactions_count'] ?? 0 }})</span>
+            </button>
+            <button 
+                wire:click="setActiveTab('achievements')"
+                class="px-4 py-2.5 uppercase tracking-wider transition-all {{ $activeTab === 'achievements' ? 'text-purple-500 border-b-2 border-purple-500 bg-purple-950/20' : 'text-zinc-500 hover:text-zinc-300' }}"
+            >
+                [ Достижения ] <span class="text-zinc-600">({{ $user->achievements()->count() }})</span>
             </button>
         </div>
     </div>
 
     <!-- Содержимое вкладок -->
     @if($activeTab === 'posts')
-        @if($posts->isEmpty())
+        @if($this->posts->isEmpty())
             <div class="text-center py-16 border border-zinc-900 bg-zinc-900/20 rounded-sm">
                 <p class="text-xs font-mono uppercase tracking-widest text-zinc-500">
                     // У пользователя пока нет публикаций.
@@ -88,7 +122,7 @@
             </div>
         @else
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                @foreach($posts as $post)
+                @foreach($this->posts as $post)
                     <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm shadow-md hover:shadow-red-950/20 transition-all duration-300 group">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
@@ -129,12 +163,11 @@
             </div>
 
             <div class="mt-10 pt-4 border-t border-zinc-900 font-mono text-xs [&_nav]:bg-transparent [&_a]:!bg-zinc-900 [&_a]:!border-zinc-800 [&_a]:!text-zinc-400 [&_span]:!bg-zinc-950 [&_span]:!border-zinc-800 [&_span]:!text-red-500">
-                {{ $posts->links() }}
+                {{ $this->posts->links() }}
             </div>
         @endif
     @elseif($activeTab === 'bookmarks')
-        @php $bookmarkedPosts = $bookmarks; @endphp
-        @if($bookmarkedPosts->isEmpty())
+        @if($this->bookmarks->isEmpty())
             <div class="text-center py-16 border border-zinc-900 bg-zinc-900/20 rounded-sm">
                 <p class="text-xs font-mono uppercase tracking-widest text-zinc-500">
                     // В избранном пока пусто. Добавляйте интересные посты!
@@ -142,7 +175,8 @@
             </div>
         @else
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                @foreach($bookmarkedPosts as $post)
+                @foreach($this->bookmarks as $bookmark)
+                    @php $post = $bookmark->post; @endphp
                     <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-amber-900/20 hover:border-amber-900/40 rounded-sm shadow-md hover:shadow-amber-950/20 transition-all duration-300 group">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between font-mono text-[10px] text-amber-500/60 uppercase tracking-wider">
@@ -175,9 +209,13 @@
                     </article>
                 @endforeach
             </div>
+
+            <div class="mt-10 pt-4 border-t border-zinc-900 font-mono text-xs [&_nav]:bg-transparent [&_a]:!bg-zinc-900 [&_a]:!border-zinc-800 [&_a]:!text-zinc-400 [&_span]:!bg-zinc-950 [&_span]:!border-zinc-800 [&_span]:!text-amber-500">
+                {{ $this->bookmarks->links() }}
+            </div>
         @endif
     @elseif($activeTab === 'reactions')
-        @if($reactions->isEmpty())
+        @if($this->reactions->isEmpty())
             <div class="text-center py-16 border border-zinc-900 bg-zinc-900/20 rounded-sm">
                 <p class="text-xs font-mono uppercase tracking-widest text-zinc-500">
                     // Вы ещё не оставили ни одной реакции.
@@ -185,7 +223,7 @@
             </div>
         @else
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                @foreach($reactions as $reaction)
+                @foreach($this->reactions as $reaction)
                     @php $post = $reaction->post; @endphp
                     <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-green-900/20 hover:border-green-900/40 rounded-sm shadow-md hover:shadow-green-950/20 transition-all duration-300 group">
                         <div class="space-y-4">
@@ -221,8 +259,42 @@
             </div>
 
             <div class="mt-10 pt-4 border-t border-zinc-900 font-mono text-xs [&_nav]:bg-transparent [&_a]:!bg-zinc-900 [&_a]:!border-zinc-800 [&_a]:!text-zinc-400 [&_span]:!bg-zinc-950 [&_span]:!border-zinc-800 [&_span]:!text-green-500">
-                {{ $reactions->links() }}
+                {{ $this->reactions->links() }}
             </div>
         @endif
+    @elseif($activeTab === 'achievements')
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach($this->achievements as $item)
+                @php
+                    $achievement = $item['achievement'];
+                    $unlocked = $item['unlocked'];
+                @endphp
+                <div class="p-5 border rounded-sm transition-all duration-300 flex flex-col gap-3
+                    {{ $unlocked
+                        ? 'bg-purple-950/10 border-purple-900/40 hover:border-purple-700/60'
+                        : 'bg-zinc-900/30 border-zinc-900 opacity-45' }}">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl {{ $unlocked ? '' : 'grayscale' }}">{{ $achievement->icon }}</span>
+                        <div class="space-y-0.5">
+                            <h3 class="text-xs font-bold font-mono text-zinc-100 uppercase tracking-wide">
+                                {{ $achievement->name }}
+                            </h3>
+                            <span class="text-[9px] font-mono uppercase tracking-widest
+                                {{ $unlocked ? 'text-purple-400' : 'text-zinc-600' }}">
+                                [ {{ $unlocked ? 'Получено' : 'Заблокировано' }} ]
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 font-sans leading-relaxed flex-1">
+                        {{ $achievement->description }}
+                    </p>
+                    @if(! $unlocked)
+                        <div class="text-[9px] font-mono text-zinc-600 uppercase tracking-wider border-t border-zinc-950 pt-2">
+                            Требуется: {{ $achievement->required_count }} ед.
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
     @endif
 </div>

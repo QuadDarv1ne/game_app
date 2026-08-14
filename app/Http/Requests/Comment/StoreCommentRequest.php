@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Comment;
 
+use App\Models\Comment;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,9 +23,12 @@ class StoreCommentRequest extends FormRequest
      */
     public function rules(): array
     {
+        $comment = $this->route('comment');
+
+        $commentId = $comment instanceof Comment ? $comment->id : null;
+
         return [
-            'post_id' => 'nullable|exists:posts,id',
-            'user_id' => 'nullable|exists:users,id',
+            'post_id' => $commentId ? 'nullable|exists:posts,id' : 'required|exists:posts,id',
             'content' => 'required|string|max:1000',
         ];
     }

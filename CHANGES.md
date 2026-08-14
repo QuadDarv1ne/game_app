@@ -11,9 +11,18 @@
 - **Проблема:** Использовалось `$post->content`, но поле в модели называется `body`
 - **Решение:** Заменено на `$post->body`
 
-### 2. Несоответствие таблиц в отношениях
+### 3. Несоответствие таблиц в отношениях
 - **Проблема:** В `Tag.php` указана таблица `post_tag`, а в `Post.php` — `post_tags`
 - **Решение:** Исправлено в `Tag.php` на `post_tags` с правильными внешними ключами
+
+### 4. Похожие посты могли включать сам пост (14 августа 2026)
+- **Проблема:** `orWhereHas('tags')` находился вне группы `where(...)`, из-за чего фильтр `id != post->id` игнорировался
+- **Решение:** Запрос обёрнут в `where(function ($q) { $q->where(...)->orWhereHas(...) })` в `PostController::show`
+
+### 5. Ошибка компиляции профиля (14 августа 2026)
+- **Проблема:** В кнопках вкладок профиля не закрывалась директива `{{ }}` в атрибуте `class`, из-за чего Blade «проглатывал» последующие строки — страница падала с ParseError
+- **Решение:** Добавлены закрывающие `}}`, а доступ к computed-свойствам в шаблоне заменён на `$this->posts` / `$this->bookmarks` / `$this->reactions` / `$this->achievements`
+- **Обнаружено:** новый тест `ProfileTest` — страница профиля ранее не покрывалась тестами
 
 ---
 
@@ -149,6 +158,46 @@ php artisan db:seed --class=GameAppSeeder
 
 ---
 
+### 7. 🏆 Система рангов и достижений (14 августа 2026)
+
+**Файлы:**
+- `database/migrations/2026_08_14_000001_add_rank_id_to_users_table.php` — миграция (FK `rank_id` → `user_ranks`)
+- `app/Models/UserRank.php`, `app/Models/Achievement.php` — модели
+- `database/seeders/UserRankSeeder.php` — 5 рангов
+- `database/seeders/AchievementSeeder.php` — 8 достижений
+- `app/Services/AchievementService.php` — сервис синхронизации достижений
+- `app/Models/User.php` — связь `rank()`, метод `assignRank()`
+- `app/Livewire/UserProfile.php`, `resources/views/livewire/user-profile.blade.php` — бейдж ранга, прогресс-бар, вкладка «Достижения»
+- `database/factories/AchievementFactory.php`, `database/factories/UserRankFactory.php` — фабрики
+- `tests/Feature/AchievementTest.php`, `tests/Feature/UserRankTest.php`, `tests/Feature/ProfileTest.php` — тесты
+
+**Ранги:**
+- 🎮 Новичок → ✍️ Автор → 💬 Активный участник → 🏆 Эксперт → 👑 Легенда
+- Ранг повышается автоматически при создании постов, комментариев и реакций (метод `assignRank()`)
+
+**Достижения:**
+- posts_1 / posts_10 / posts_25 — количество постов
+- comments_1 / comments_50 — количество комментариев
+- reactions_1 / reactions_100 — количество реакций
+- bookmarks_10 — количество избранного
+
+**Возможности:**
+- Бейдж ранга и прогресс-бар «до следующего ранга» в профиле
+- Вкладка «Достижения» с иконками и статусом «Получено/Заблокировано»
+- `AchievementService::sync(User)` вызывается в `PostController::store`, `CommentController::store`, `ToggleReaction`, `ToggleBookmark`
+
+### 8. 🧹 Качество кода: phpstan 69 → 0 ошибок (14 августа 2026)
+
+**Исправлено:**
+- Добавлены generic-аннотации всем моделям и Livewire-компонентам (phpstan уровень 6)
+- `StoreCommentRequest` — корректное сужение типа из `route('comment')`
+- `UserFactory::withTwoFactor()` — добавлено состояние вместо пустого тела
+- `PostTagsSeeder` — баг `count(1,4)` → `random(rand(1,4))`
+- `NotificationService::commentLiked()` — корректная типизация параметров
+- Добавлены фабрики `BookmarkFactory`, `PostTagFactory`, `AchievementFactory`, `UserRankFactory`
+
+---
+
 ## 📁 Новая структура файлов
 
 ```
@@ -234,4 +283,4 @@ routes/
 - [ ] Тёмная/светлая тема
 - [ ] REST API
 - [x] Подписки на авторов
-- [ ] Ранги и достижения пользователей
+- [x] Ранги и достижения пользователей

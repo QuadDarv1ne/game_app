@@ -4,8 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use App\Models\Post;
-use App\Models\PostTag;
-use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

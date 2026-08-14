@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Post;
 use App\Models\User;
@@ -17,11 +18,15 @@ class NotificationService
             return;
         }
 
+        if (! $post->user) {
+            return;
+        }
+
         Notification::create([
             'user_id' => $post->user_id,
             'type' => 'like',
             'title' => 'Вам поставили лайк!',
-            'message' => $user->name . ' оценил ваш пост: ' . $post->title,
+            'message' => $user->name.' оценил ваш пост: '.$post->title,
             'link' => route('posts.show', $post),
         ]);
     }
@@ -39,7 +44,7 @@ class NotificationService
             'user_id' => $post->user_id,
             'type' => 'dislike',
             'title' => 'Вам поставили дизлайк!',
-            'message' => $user->name . ' не оценил ваш пост: ' . $post->title,
+            'message' => $user->name.' не оценил ваш пост: '.$post->title,
             'link' => route('posts.show', $post),
         ]);
     }
@@ -57,17 +62,21 @@ class NotificationService
             'user_id' => $post->user_id,
             'type' => 'comment',
             'title' => 'Новый комментарий!',
-            'message' => $user->name . ' прокомментировал ваш пост: ' . $post->title,
-            'link' => route('posts.show', $post) . '#comments',
+            'message' => $user->name.' прокомментировал ваш пост: '.$post->title,
+            'link' => route('posts.show', $post).'#comments',
         ]);
     }
 
     /**
      * Отправить уведомление о лайке комментария.
      */
-    public function commentLiked($comment, User $user): void
+    public function commentLiked(Comment $comment, User $user): void
     {
         if ($comment->user_id === $user->id) {
+            return;
+        }
+
+        if (! $comment->post) {
             return;
         }
 
@@ -75,8 +84,8 @@ class NotificationService
             'user_id' => $comment->user_id,
             'type' => 'like',
             'title' => 'Вам поставили лайк на комментарий!',
-            'message' => $user->name . ' оценил ваш комментарий',
-            'link' => route('posts.show', $comment->post) . '#comment-' . $comment->id,
+            'message' => $user->name.' оценил ваш комментарий',
+            'link' => route('posts.show', $comment->post).'#comment-'.$comment->id,
         ]);
     }
 
@@ -93,7 +102,7 @@ class NotificationService
             'user_id' => $post->user_id,
             'type' => 'bookmark',
             'title' => 'Ваш пост добавили в избранное!',
-            'message' => $user->name . ' добавил(а) ваш пост в избранное: ' . $post->title,
+            'message' => $user->name.' добавил(а) ваш пост в избранное: '.$post->title,
             'link' => route('posts.show', $post),
         ]);
     }

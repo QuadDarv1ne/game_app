@@ -27,7 +27,7 @@
 
 @include('partials.header')
 
-<main class="flex-grow max-w-4xl mx-auto px-6 py-12 w-full space-y-10 relative overflow-hidden">
+<main class="flex-grow max-w-4xl mx-auto px-6 py-16 w-full space-y-14 relative overflow-hidden">
     <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-red-600/5 blur-[120px] rounded-full pointer-events-none"></div>
 
     <div class="relative z-10 font-mono text-xs">
@@ -42,7 +42,7 @@
         </div>
     @endif
 
-    <header class="space-y-4 border-b border-zinc-900 pb-6 relative z-10">
+    <header class="space-y-5 border-b border-zinc-900 pb-8 relative z-10">
         <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-zinc-500 uppercase tracking-wider">
             <div class="flex items-center gap-2">
                 <span>[ {{ $post->category?->name ?? 'Без категории' }} ]</span>
@@ -103,16 +103,16 @@
         @endif
     @endauth
 
-    <section class="border-t border-zinc-900 pt-10 space-y-6 relative z-10">
+    <section class="border-t border-zinc-900 pt-12 space-y-8 relative z-10">
         <div class="space-y-1">
             <h2 class="text-sm font-bold font-mono uppercase tracking-wide text-zinc-100">// Канал комментариев</h2>
             <p class="text-xs text-zinc-500 font-sans">Обсуждение публикации авторизованными пользователями платформы.</p>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-5">
             @if($post->comments && $post->comments->isNotEmpty())
                 @foreach($post->comments as $comment)
-                    <div class="p-4 bg-zinc-900 border border-zinc-800/60 rounded-sm space-y-2 group/item">
+                    <div class="p-5 bg-zinc-900 border border-zinc-800/60 rounded-sm space-y-3 group/item">
                         <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase">
                             <div class="flex items-center gap-2">
                                 <span class="text-red-400 font-bold">{{ $comment->user?->name ?? 'Аноним' }}</span>
@@ -189,15 +189,15 @@
     </section>
 
     @if($similarPosts->isNotEmpty())
-        <section class="border-t border-zinc-900 pt-10 space-y-6 relative z-10">
+    <section class="border-t border-zinc-900 pt-12 space-y-8 relative z-10">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold font-mono uppercase tracking-wide text-zinc-100">// Похожие публикации</h2>
                 <p class="text-xs text-zinc-500 font-sans">Другие материалы по этой теме.</p>
             </div>
 
-            <div class="grid gap-4 md:grid-cols-3">
+            <div class="grid gap-5 md:grid-cols-3">
                 @foreach($similarPosts as $similar)
-                    <div class="p-4 bg-zinc-900 border border-zinc-800/60 rounded-sm hover:border-red-900/40 transition-all group">
+                    <div class="p-5 bg-zinc-900 border border-zinc-800/60 rounded-sm hover:border-red-900/40 transition-all group">
                         <div class="space-y-2">
                             <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase">
                                 <span>[ {{ $similar->category?->name ?? 'Без категории' }} ]</span>

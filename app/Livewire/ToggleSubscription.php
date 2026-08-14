@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class ToggleSubscription extends Component
@@ -31,7 +32,7 @@ class ToggleSubscription extends Component
      */
     public function toggle(): void
     {
-        if (!auth()->check() || auth()->id() === $this->user->id) {
+        if (! auth()->check() || auth()->id() === $this->user->id) {
             return;
         }
 
@@ -48,7 +49,7 @@ class ToggleSubscription extends Component
         $this->subscribersCount = $this->user->subscribersCount();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.toggle-subscription');
     }

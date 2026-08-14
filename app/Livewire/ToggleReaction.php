@@ -3,7 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Post;
+use App\Models\User;
+use App\Services\AchievementService;
 use App\Services\NotificationService;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class ToggleReaction extends Component
@@ -18,6 +21,7 @@ class ToggleReaction extends Component
 
     public int $dislikesCount = 0;
 
+    /** @var array<string, string> */
     protected $listeners = ['reactionSent' => '$refresh'];
 
     /**
@@ -40,7 +44,7 @@ class ToggleReaction extends Component
      */
     public function toggleLike(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return;
         }
 
@@ -58,13 +62,14 @@ class ToggleReaction extends Component
                 $user->removeReaction($this->post, 'dislike');
                 $this->isDisliked = false;
             }
-            
+
             // Отправляем уведомление
             $service->postLiked($this->post, $user);
         }
 
-        $this->likesCount = $this->post->likesCount();
-        $this->dislikesCount = $this->post->dislikesCount();
+        $this->syncProgress($user);
+
+        $this->refreshCounts();
     }
 
     /**
@@ -72,7 +77,7 @@ class ToggleReaction extends Component
      */
     public function toggleDislike(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return;
         }
 
@@ -90,16 +95,35 @@ class ToggleReaction extends Component
                 $user->removeReaction($this->post, 'like');
                 $this->isLiked = false;
             }
-            
+
             // Отправляем уведомление
             $service->postDisliked($this->post, $user);
         }
 
+        $this->syncProgress($user);
+
+        $this->refreshCounts();
+    }
+
+    /**
+     * Обновить достижения и ранг пользователя.
+     */
+    protected function syncProgress(User $user): void
+    {
+        app(AchievementService::class)->sync($user);
+        $user->assignRank();
+    }
+
+    /**
+     * Обновить счётчики реакций.
+     */
+    protected function refreshCounts(): void
+    {
         $this->likesCount = $this->post->likesCount();
         $this->dislikesCount = $this->post->dislikesCount();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.toggle-reaction');
     }

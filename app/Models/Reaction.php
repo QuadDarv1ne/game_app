@@ -13,6 +13,8 @@ class Reaction extends Model
 
     /**
      * Пользователь, оставивший реакцию.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -21,6 +23,8 @@ class Reaction extends Model
 
     /**
      * Пост, на который оставлена реакция.
+     *
+     * @return BelongsTo<Post, $this>
      */
     public function post(): BelongsTo
     {

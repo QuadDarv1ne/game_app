@@ -20,7 +20,7 @@ class PostTagsSeeder extends Seeder
         }
 
         Post::all()->each(function (Post $post) use ($tags) {
-            $randomTagIds = $tags->random($tags->count(1, 4))->pluck('id');
+            $randomTagIds = $tags->random(rand(1, 4))->pluck('id');
 
             $post->tags()->attach($randomTagIds);
         });

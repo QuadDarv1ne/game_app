@@ -1,10 +1,10 @@
 <x-layouts::app :title="'Панель управления'">
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-sm">
+    <div class="flex h-full w-full flex-1 flex-col gap-6 rounded-sm">
 
-        <div class="relative flex-1 min-h-[350px] flex flex-col items-center justify-center p-8 rounded-sm bg-zinc-900 border border-red-900/30 shadow-xl overflow-hidden">
+        <div class="relative flex-1 min-h-[350px] flex flex-col items-center justify-center p-10 rounded-sm bg-zinc-900 border border-red-900/30 shadow-xl overflow-hidden">
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-red-600/5 blur-[80px] rounded-full pointer-events-none"></div>
 
-            <div class="max-w-md text-center space-y-6 relative z-10">
+            <div class="max-w-md text-center space-y-8 relative z-10">
                 <div class="space-y-2">
                     <span class="text-[11px] font-mono tracking-widest text-red-500 uppercase font-bold">// Терминал пользователя</span>
                     <h2 class="text-xl font-bold font-mono uppercase tracking-wide text-zinc-100">Управление аккаунтом</h2>
@@ -13,7 +13,7 @@
                     </p>
                 </div>
 
-                <div class="flex flex-col gap-3 pt-1">
+                <div class="flex flex-col gap-4 pt-2">
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <a href="{{route('home')}}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-red-700 hover:bg-red-600 text-white font-mono uppercase font-bold text-xs tracking-wider rounded-sm shadow-md shadow-red-950/60 transition-all active:scale-[0.98] group">
                             Главная

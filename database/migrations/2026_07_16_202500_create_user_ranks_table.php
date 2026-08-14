@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('user_ranks', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->integer('level')->default(1);
+            $table->integer('required_posts')->default(0);
+            $table->integer('required_comments')->default(0);
+            $table->integer('required_reactions')->default(0);
+            $table->string('icon')->default('🏅');
+            $table->string('color')->default('#6366f1');
             $table->timestamps();
         });
     }

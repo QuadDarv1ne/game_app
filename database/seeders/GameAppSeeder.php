@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\AchievementService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,6 +18,11 @@ class GameAppSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            UserRankSeeder::class,
+            AchievementSeeder::class,
+        ]);
+
         // Создаём тестовых пользователей
         $users = User::factory()->count(5)->create();
 
@@ -43,9 +49,9 @@ class GameAppSeeder extends Seeder
             'OpenWorld' => 'Открытый мир',
             'Survival' => 'Выживание',
         ];
-        
+
         foreach ($tagNames as $name => $desc) {
-            if (!$tags->has($name)) {
+            if (! $tags->has($name)) {
                 $tags->put($name, Tag::create(['name' => $name, 'description' => $desc]));
             }
         }
@@ -100,7 +106,7 @@ class GameAppSeeder extends Seeder
                 while ($otherUser->id === $user->id) {
                     $otherUser = $users->random();
                 }
-                
+
                 Comment::create([
                     'post_id' => $post->id,
                     'user_id' => $otherUser->id,
@@ -123,6 +129,14 @@ class GameAppSeeder extends Seeder
             'email' => 'admin@gameapp.local',
             'password' => Hash::make('password'),
         ]);
+
+        // Выдаём ранги и достижения всем пользователям
+        $achievementService = app(AchievementService::class);
+
+        foreach ($users->push($admin) as $user) {
+            $achievementService->sync($user);
+            $user->assignRank();
+        }
 
         info('GameAppSeeder:_seed_completed');
     }

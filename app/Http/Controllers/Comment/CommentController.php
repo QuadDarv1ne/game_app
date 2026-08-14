@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Comment;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Models\Comment;
+use App\Services\AchievementService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
@@ -22,7 +24,19 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request): RedirectResponse
     {
-        Comment::create($request->validated());
+        $user = auth()->user();
+
+        $comment = Comment::create(array_merge($request->validated(), [
+            'user_id' => $user->id,
+        ]));
+
+        $comment->load('post');
+
+        $notificationService = app(NotificationService::class);
+        $notificationService->postCommented($comment->post, $user);
+
+        app(AchievementService::class)->sync($user);
+        $user->assignRank();
 
         return back()->with('success', 'Комментарий успешно добавлен!');
     }
@@ -32,12 +46,11 @@ class CommentController extends Controller
      */
     public function update(StoreCommentRequest $request, Comment $comment): RedirectResponse
     {
-        if (auth()->user()->id !== $comment->user_id) {
-            abort(403, 'Вы не можете редактировать этот комментарий!');
-        }
+        $this->authorize('update', $comment);
+
         $comment->update($request->validated());
 
-        return back()->with('success', 'Коментарий изменен!');
+        return back()->with('success', 'Комментарий изменен!');
     }
 
     /**
@@ -45,9 +58,8 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment): RedirectResponse
     {
-        if (auth()->user()->id !== $comment->user_id) {
-            abort(403, 'Вы не можете редактировать этот комментарий!');
-        }
+        $this->authorize('delete', $comment);
+
         $comment->delete();
 
         return back()->with('success', 'Комментарий удален!');

@@ -7,17 +7,13 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Reaction;
-use App\Models\CommentLike;
-use App\Models\Notification;
-use App\Models\Subscription;
-use App\Models\Achievement;
 
 /**
  * @property int $id
@@ -32,7 +28,7 @@ use App\Models\Achievement;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'rank_id', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -66,6 +62,8 @@ class User extends Authenticatable
 
     /**
      * Посты пользователя.
+     *
+     * @return HasMany<Post, $this>
      */
     public function posts(): HasMany
     {
@@ -74,6 +72,8 @@ class User extends Authenticatable
 
     /**
      * Комментарии пользователя.
+     *
+     * @return HasMany<Comment, $this>
      */
     public function comments(): HasMany
     {
@@ -82,6 +82,8 @@ class User extends Authenticatable
 
     /**
      * Избранные посты пользователя.
+     *
+     * @return HasMany<Bookmark, $this>
      */
     public function bookmarks(): HasMany
     {
@@ -90,6 +92,8 @@ class User extends Authenticatable
 
     /**
      * Реакции пользователя на посты.
+     *
+     * @return HasMany<Reaction, $this>
      */
     public function reactions(): HasMany
     {
@@ -98,6 +102,8 @@ class User extends Authenticatable
 
     /**
      * Лайки комментариев пользователя.
+     *
+     * @return HasMany<CommentLike, $this>
      */
     public function commentLikes(): HasMany
     {
@@ -106,6 +112,8 @@ class User extends Authenticatable
 
     /**
      * Уведомления пользователя.
+     *
+     * @return HasMany<Notification, $this>
      */
     public function notifications(): HasMany
     {
@@ -114,6 +122,8 @@ class User extends Authenticatable
 
     /**
      * Подписки пользователя (на кого подписан).
+     *
+     * @return HasMany<Subscription, $this>
      */
     public function subscriptions(): HasMany
     {
@@ -122,6 +132,8 @@ class User extends Authenticatable
 
     /**
      * Подписчики пользователя (кто подписался на него).
+     *
+     * @return HasMany<Subscription, $this>
      */
     public function subscribers(): HasMany
     {
@@ -130,10 +142,45 @@ class User extends Authenticatable
 
     /**
      * Достижения пользователя.
+     *
+     * @return BelongsToMany<Achievement, $this>
      */
     public function achievements(): BelongsToMany
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements');
+    }
+
+    /**
+     * Текущий ранг пользователя.
+     *
+     * @return BelongsTo<UserRank, $this>
+     */
+    public function rank(): BelongsTo
+    {
+        return $this->belongsTo(UserRank::class, 'rank_id');
+    }
+
+    /**
+     * Пересчитать и назначить ранг в соответствии с активностью пользователя.
+     */
+    public function assignRank(): void
+    {
+        $user = $this->loadCount([
+            'posts',
+            'comments',
+            'reactions',
+        ]);
+
+        $rank = UserRank::query()
+            ->where('required_posts', '<=', $user->getAttributes()['posts_count'])
+            ->where('required_comments', '<=', $user->getAttributes()['comments_count'])
+            ->where('required_reactions', '<=', $user->getAttributes()['reactions_count'])
+            ->orderByDesc('level')
+            ->first();
+
+        if ($rank !== null && $this->rank_id !== $rank->id) {
+            $this->update(['rank_id' => $rank->id]);
+        }
     }
 
     /**
@@ -149,7 +196,9 @@ class User extends Authenticatable
      */
     public function isSubscribed(User $user): bool
     {
-        return $this->subscriptions()->where('author_id', $user->id)->exists();
+        return $this->subscriptions()
+            ->where('author_id', $user->id)
+            ->exists();
     }
 
     /**
@@ -157,7 +206,7 @@ class User extends Authenticatable
      */
     public function subscribe(User $user): void
     {
-        if (!$this->isSubscribed($user)) {
+        if (! $this->isSubscribed($user)) {
             $this->subscriptions()->create(['author_id' => $user->id]);
         }
     }
@@ -191,7 +240,7 @@ class User extends Authenticatable
      */
     public function bookmark(Post $post): void
     {
-        if (!$this->hasBookmarked($post)) {
+        if (! $this->hasBookmarked($post)) {
             $this->bookmarks()->create(['post_id' => $post->id]);
         }
     }
@@ -217,7 +266,7 @@ class User extends Authenticatable
      */
     public function react(Post $post, string $type): void
     {
-        if (!$this->hasReacted($post, $type)) {
+        if (! $this->hasReacted($post, $type)) {
             $this->reactions()->create(['post_id' => $post->id, 'type' => $type]);
         }
     }
@@ -232,14 +281,23 @@ class User extends Authenticatable
 
     /**
      * Получить статистику пользователя.
+     *
+     * @return array<string, int>
      */
     public function getStats(): array
     {
+        $user = $this->loadCount([
+            'posts',
+            'comments',
+            'bookmarks',
+            'reactions',
+        ]);
+
         return [
-            'posts_count' => $this->posts()->count(),
-            'comments_count' => $this->comments()->count(),
-            'bookmarks_count' => $this->bookmarks()->count(),
-            'reactions_count' => $this->reactions()->count(),
+            'posts_count' => (int) $user->getAttributes()['posts_count'],
+            'comments_count' => (int) $user->getAttributes()['comments_count'],
+            'bookmarks_count' => (int) $user->getAttributes()['bookmarks_count'],
+            'reactions_count' => (int) $user->getAttributes()['reactions_count'],
         ];
     }
 }

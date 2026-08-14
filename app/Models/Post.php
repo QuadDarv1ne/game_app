@@ -2,37 +2,57 @@
 
 namespace App\Models;
 
+use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Reaction;
 
 class Post extends Model
 {
-
+    /** @use HasFactory<PostFactory> */
     use HasFactory;
+
     protected $table = 'posts';
 
     protected $fillable = ['user_id', 'category_id', 'title', 'description', 'body'];
 
-
+    /**
+     * Автор поста.
+     *
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Категория поста.
+     *
+     * @return BelongsTo<Category, $this>
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    /**
+     * Теги поста.
+     *
+     * @return BelongsToMany<Tag, $this>
+     */
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'post_tags', 'post_id', 'tag_id');
     }
 
+    /**
+     * Комментарии поста.
+     *
+     * @return HasMany<Comment, $this>
+     */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
@@ -40,6 +60,8 @@ class Post extends Model
 
     /**
      * Закладки пользователя на этот пост.
+     *
+     * @return HasMany<Bookmark, $this>
      */
     public function bookmarks(): HasMany
     {
@@ -48,6 +70,8 @@ class Post extends Model
 
     /**
      * Реакции пользователей на этот пост.
+     *
+     * @return HasMany<Reaction, $this>
      */
     public function reactions(): HasMany
     {
@@ -58,14 +82,6 @@ class Post extends Model
      * Количество закладок на этот пост.
      */
     public function bookmarksCount(): int
-    {
-        return $this->bookmarks()->count();
-    }
-
-    /**
-     * Получить количество закладок (для withCount).
-     */
-    public function getBookmarksCountAttribute(): int
     {
         return $this->bookmarks()->count();
     }

@@ -20,13 +20,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Профиль текущего пользователя
     Route::get('profile', function () {
-        return app(UserProfile::class)->mount(auth()->user());
+        return redirect()->route('profile.show', auth()->id());
     })->name('profile');
 
-    // Просмотр профиля другого пользователя
-    Route::get('profile/{user}', function ($user) {
-        return app(UserProfile::class)->mount($user);
-    })->name('profile.show');
+    // Просмотр профиля пользователя
+    Route::get('profile/{user}', UserProfile::class)->name('profile.show');
 
     // Переключатель избранного
     Route::post('posts/{post}/bookmark', ToggleBookmark::class)->name('posts.bookmark');
@@ -45,4 +43,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
-

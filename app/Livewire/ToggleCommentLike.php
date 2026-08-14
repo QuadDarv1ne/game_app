@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Comment;
+use App\Services\NotificationService;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class ToggleCommentLike extends Component
@@ -31,7 +33,7 @@ class ToggleCommentLike extends Component
      */
     public function toggle(): void
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return;
         }
 
@@ -43,12 +45,17 @@ class ToggleCommentLike extends Component
         } else {
             $user->commentLikes()->create(['comment_id' => $this->comment->id]);
             $this->isLiked = true;
+
+            $this->comment->load('user');
+
+            $notificationService = app(NotificationService::class);
+            $notificationService->commentLiked($this->comment, $user);
         }
 
         $this->likesCount = $this->comment->likesCount();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.toggle-comment-like');
     }

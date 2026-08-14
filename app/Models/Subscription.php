@@ -13,6 +13,8 @@ class Subscription extends Model
 
     /**
      * Подписчик.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function subscriber(): BelongsTo
     {
@@ -21,6 +23,8 @@ class Subscription extends Model
 
     /**
      * Автор, на которого подписались.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function author(): BelongsTo
     {

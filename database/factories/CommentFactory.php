@@ -20,8 +20,8 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'post_id' => Post::all()->random(),
-            'user_id' => User::all()->random(),
+            'post_id' => Post::factory(),
+            'user_id' => User::factory(),
             'content' => $this->faker->paragraph(3),
         ];
     }

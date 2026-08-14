@@ -16,7 +16,7 @@
 
 @include('partials.header')
 
-<main class="flex-grow max-w-7xl mx-auto px-6 py-12 w-full space-y-10 relative overflow-hidden">
+<main class="flex-grow max-w-7xl mx-auto px-6 py-16 w-full space-y-14 relative overflow-hidden">
     <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-600/5 blur-[150px] rounded-full pointer-events-none"></div>
 
     <div class="border-b border-zinc-900 pb-6 relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -39,7 +39,7 @@
     @endif
 
     <!-- Поиск и фильтры -->
-    <div class="p-5 bg-zinc-900 border border-zinc-800/80 rounded-sm space-y-4 relative z-10">
+    <div class="p-7 bg-zinc-900 border border-zinc-800/80 rounded-sm space-y-5 relative z-10">
         <div class="flex items-center justify-between">
             <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-zinc-300">
                 // Фильтры и поиск
@@ -50,7 +50,7 @@
             </a>
         </div>
 
-        <form action="{{ route('posts.index') }}" method="GET" class="space-y-4">
+        <form action="{{ route('posts.index') }}" method="GET" class="space-y-5">
             <!-- Поиск -->
             <div class="relative">
                 <input 
@@ -142,11 +142,11 @@
             <p class="text-xs font-mono uppercase tracking-widest text-zinc-500">// Архивы пусты. Ожидание первого материала...</p>
         </div>
     @else
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative z-10">
+        <div class="grid gap-7 md:grid-cols-2 lg:grid-cols-3 relative z-10">
             @foreach($posts->loadCount(['comments', 'reactions' => function ($q) {
                 $q->where('type', 'like');
             }]) as $post)
-                <article class="flex flex-col justify-between p-6 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm shadow-md hover:shadow-red-950/20 transition-all duration-300 group">
+                <article class="flex flex-col justify-between p-7 bg-zinc-900 border border-zinc-800/80 hover:border-red-900/40 rounded-sm shadow-md hover:shadow-red-950/20 transition-all duration-300 group">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
                             <span>[ {{ $post->category?->name ?? 'Без категории' }} ]</span>
@@ -213,7 +213,7 @@
             @endforeach
         </div>
 
-        <div class="mt-10 pt-4 border-t border-zinc-900 font-mono text-xs [&_nav]:bg-transparent [&_a]:!bg-zinc-900 [&_a]:!border-zinc-800 [&_a]:!text-zinc-400 [&_span]:!bg-zinc-950 [&_span]:!border-zinc-800 [&_span]:!text-red-500">
+        <div class="mt-14 pt-5 border-t border-zinc-900 font-mono text-xs [&_nav]:bg-transparent [&_a]:!bg-zinc-900 [&_a]:!border-zinc-800 [&_a]:!text-zinc-400 [&_span]:!bg-zinc-950 [&_span]:!border-zinc-800 [&_span]:!text-red-500">
             {{ $posts->links() }}
         </div>
     @endif

@@ -17,6 +17,8 @@ class Notification extends Model
 
     /**
      * Пользователь, которому отправлено уведомление.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -36,7 +38,7 @@ class Notification extends Model
      */
     public function getIconAttribute(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'like' => '👍',
             'dislike' => '👎',
             'comment' => '💬',

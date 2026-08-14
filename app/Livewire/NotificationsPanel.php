@@ -3,6 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\Notification;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
+use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorInstance;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -10,15 +13,26 @@ class NotificationsPanel extends Component
 {
     use WithPagination;
 
-    public $showPanel = false;
-    public $filter = 'all'; // all, unread
+    public bool $showPanel = false;
+
+    public string $filter = 'all'; // all, unread
 
     /**
      * Получить уведомления текущего пользователя.
+     *
+     * @return LengthAwarePaginator<int, Notification>
      */
-    public function getNotificationsProperty()
+    public function getNotificationsProperty(): LengthAwarePaginator
     {
-        $query = auth()->user()->notifications()->latest();
+        $user = auth()->user();
+
+        if (! $user) {
+            return new LengthAwarePaginatorInstance([], 0, 10, null, [
+                'path' => request()->path(),
+            ]);
+        }
+
+        $query = $user->notifications()->latest();
 
         if ($this->filter === 'unread') {
             $query->where('is_read', false);
@@ -32,17 +46,23 @@ class NotificationsPanel extends Component
      */
     public function toggle(): void
     {
-        $this->showPanel = !$this->showPanel;
+        $this->showPanel = ! $this->showPanel;
     }
 
     /**
      * Отметить уведомление как прочитанное.
      */
-    public function markAsRead($notificationId): void
+    public function markAsRead(int $notificationId): void
     {
+        $user = auth()->user();
+
+        if (! $user) {
+            return;
+        }
+
         Notification::where('id', $notificationId)
-            ->where('user_id', auth()->id())
-            ->update(['is_read' => false]);
+            ->where('user_id', $user->id)
+            ->update(['is_read' => true]);
     }
 
     /**
@@ -50,29 +70,41 @@ class NotificationsPanel extends Component
      */
     public function markAllAsRead(): void
     {
-        auth()->user()->notifications()->where('is_read', false)
+        $user = auth()->user();
+
+        if (! $user) {
+            return;
+        }
+
+        $user->notifications()->where('is_read', false)
             ->update(['is_read' => true]);
     }
 
     /**
      * Удалить уведомление.
      */
-    public function delete($notificationId): void
+    public function delete(int $notificationId): void
     {
+        $user = auth()->user();
+
+        if (! $user) {
+            return;
+        }
+
         Notification::where('id', $notificationId)
-            ->where('user_id', auth()->id())
+            ->where('user_id', $user->id)
             ->delete();
     }
 
     /**
      * Установить фильтр.
      */
-    public function setFilter($filter): void
+    public function setFilter(string $filter): void
     {
         $this->filter = $filter;
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.notifications-panel');
     }

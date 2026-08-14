@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tag;
-use App\Models\User;
-use Database\Factories\PostTagsFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -19,6 +16,8 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
+            UserRankSeeder::class,
+            AchievementSeeder::class,
             CategorySeeder::class,
             TagSeeder::class,
             UserSeeder::class,

@@ -2,18 +2,24 @@
 
 namespace App\Models;
 
+use Database\Factories\UserRankFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserRank extends Model
 {
+    /** @use HasFactory<UserRankFactory> */
+    use HasFactory;
+
     protected $table = 'user_ranks';
 
     protected $fillable = ['name', 'slug', 'level', 'required_posts', 'required_comments', 'required_reactions', 'icon', 'color'];
 
     /**
      * Пользователи с этим рангом.
+     *
+     * @return HasMany<User, $this>
      */
     public function users(): HasMany
     {
@@ -26,7 +32,7 @@ class UserRank extends Model
     public function getCurrentRank(): ?self
     {
         $currentUser = auth()->user();
-        if (!$currentUser) {
+        if (! $currentUser) {
             return null;
         }
 
@@ -43,20 +49,20 @@ class UserRank extends Model
     public function getProgressPercentage(): int
     {
         $currentUser = auth()->user();
-        if (!$currentUser) {
+        if (! $currentUser) {
             return 0;
         }
 
-        $postsProgress = $this->required_posts > 0 
-            ? min(100, ($currentUser->posts()->count() / $this->required_posts) * 100) 
+        $postsProgress = $this->required_posts > 0
+            ? min(100, ($currentUser->posts()->count() / $this->required_posts) * 100)
             : 100;
-        
-        $commentsProgress = $this->required_comments > 0 
-            ? min(100, ($currentUser->comments()->count() / $this->required_comments) * 100) 
+
+        $commentsProgress = $this->required_comments > 0
+            ? min(100, ($currentUser->comments()->count() / $this->required_comments) * 100)
             : 100;
-        
-        $reactionsProgress = $this->required_reactions > 0 
-            ? min(100, ($currentUser->reactions()->count() / $this->required_reactions) * 100) 
+
+        $reactionsProgress = $this->required_reactions > 0
+            ? min(100, ($currentUser->reactions()->count() / $this->required_reactions) * 100)
             : 100;
 
         return (int) round(($postsProgress + $commentsProgress + $reactionsProgress) / 3);

@@ -13,6 +13,8 @@ class CommentLike extends Model
 
     /**
      * Пользователь, поставивший лайк.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -21,6 +23,8 @@ class CommentLike extends Model
 
     /**
      * Комментарий, на который поставлен лайк.
+     *
+     * @return BelongsTo<Comment, $this>
      */
     public function comment(): BelongsTo
     {
