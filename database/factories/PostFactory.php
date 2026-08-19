@@ -25,6 +25,7 @@ class PostFactory extends Factory
             'title' => $this->faker->sentence(6),
             'body' => $this->faker->paragraph(3),
             'description' => $this->faker->paragraph(1),
+            'views' => $this->faker->numberBetween(0, 5000),
         ];
     }
 }

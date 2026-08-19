@@ -16,7 +16,7 @@ class Post extends Model
 
     protected $table = 'posts';
 
-    protected $fillable = ['user_id', 'category_id', 'title', 'description', 'body'];
+    protected $fillable = ['user_id', 'category_id', 'title', 'description', 'body', 'views'];
 
     /**
      * Автор поста.
@@ -108,5 +108,13 @@ class Post extends Model
     public function reactionScore(): int
     {
         return $this->likesCount() - $this->dislikesCount();
+    }
+
+    /**
+     * Увеличить счётчик просмотров на единицу.
+     */
+    public function incrementViews(): void
+    {
+        $this->increment('views');
     }
 }

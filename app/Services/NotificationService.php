@@ -40,6 +40,10 @@ class NotificationService
             return;
         }
 
+        if (! $post->user) {
+            return;
+        }
+
         Notification::create([
             'user_id' => $post->user_id,
             'type' => 'dislike',
@@ -103,6 +107,24 @@ class NotificationService
             'type' => 'bookmark',
             'title' => 'Ваш пост добавили в избранное!',
             'message' => $user->name.' добавил(а) ваш пост в избранное: '.$post->title,
+            'link' => route('posts.show', $post),
+        ]);
+    }
+
+    /**
+     * Уведомить подписчиков о новой публикации автора.
+     */
+    public function postPublished(Post $post, User $subscriber): void
+    {
+        if ($post->user_id === $subscriber->id) {
+            return;
+        }
+
+        Notification::create([
+            'user_id' => $subscriber->id,
+            'type' => 'post',
+            'title' => 'Новая публикация!',
+            'message' => $post->user?->name.' опубликовал новый пост: '.$post->title,
             'link' => route('posts.show', $post),
         ]);
     }

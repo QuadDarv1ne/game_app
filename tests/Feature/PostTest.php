@@ -16,6 +16,73 @@ test('guests can view a post', function () {
     $response->assertOk();
 });
 
+test('viewing a post increments its views counter', function () {
+    $post = Post::factory()->create(['views' => 10]);
+
+    $this->get(route('posts.show', $post));
+    $this->get(route('posts.show', $post));
+
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'views' => 12,
+    ]);
+});
+
+test('publishing a post notifies subscribers of the author', function () {
+    $author = User::factory()->create();
+    $subscriber = User::factory()->create();
+    $category = Category::factory()->create();
+
+    $subscriber->subscribe($author);
+
+    $this->actingAs($author);
+
+    $this->post(route('posts.store'), [
+        'title' => 'New Subscriber Post',
+        'description' => 'Description',
+        'body' => 'Body content',
+        'category_id' => $category->id,
+    ]);
+
+    $this->assertDatabaseHas('notifications', [
+        'user_id' => $subscriber->id,
+        'type' => 'post',
+        'title' => 'Новая публикация!',
+    ]);
+});
+
+test('author does not receive a notification for their own post', function () {
+    $author = User::factory()->create();
+    $category = Category::factory()->create();
+
+    $this->actingAs($author);
+
+    $this->post(route('posts.store'), [
+        'title' => 'Own Post',
+        'description' => 'Description',
+        'body' => 'Body content',
+        'category_id' => $category->id,
+    ]);
+
+    $this->assertDatabaseMissing('notifications', [
+        'user_id' => $author->id,
+        'type' => 'post',
+    ]);
+});
+
+test('rss feed returns xml with latest posts', function () {
+    Post::factory()->create(['title' => 'Feed Post One']);
+    Post::factory()->create(['title' => 'Feed Post Two']);
+
+    $response = $this->get(route('posts.feed'));
+
+    $response->assertOk();
+    $response->assertHeader('Content-Type', 'application/rss+xml; charset=utf-8');
+    $response->assertSee('Feed Post One');
+    $response->assertSee('Feed Post Two');
+    $response->assertSee('<?xml', false);
+});
+
 test('authenticated users can create a post', function () {
     $user = User::factory()->create();
     $category = Category::factory()->create();

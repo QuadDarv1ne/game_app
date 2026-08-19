@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Post\PostController;
 use App\Livewire\ToggleBookmark;
 use App\Livewire\UserProfile;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Route;
 
 // Главная страница
@@ -13,6 +14,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Публичные маршруты (Доступны всем без авторизации)
 Route::get('posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+Route::get('feed', [PostController::class, 'feed'])->name('posts.feed');
 
 // Маршруты, доступные только авторизованным пользователям
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -40,6 +42,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Ресурсные маршруты для комментариев
     Route::resource('comments', CommentController::class);
+
+    // Открыть уведомление (помечает прочитанным и ведёт по ссылке)
+    Route::get('notifications/{notification}/open', function (Notification $notification) {
+        abort_unless($notification->user_id === auth()->id(), 403);
+
+        $notification->markAsRead();
+
+        return $notification->link
+            ? redirect($notification->link)
+            : redirect()->route('posts.index');
+    })->name('notifications.open');
 });
 
 require __DIR__.'/settings.php';

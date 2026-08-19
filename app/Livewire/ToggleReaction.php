@@ -31,11 +31,12 @@ class ToggleReaction extends Component
     {
         $this->post = $post;
 
+        $this->likesCount = $post->likesCount();
+        $this->dislikesCount = $post->dislikesCount();
+
         if (auth()->check()) {
             $this->isLiked = auth()->user()->hasReacted($post, 'like');
             $this->isDisliked = auth()->user()->hasReacted($post, 'dislike');
-            $this->likesCount = $post->likesCount();
-            $this->dislikesCount = $post->dislikesCount();
         }
     }
 

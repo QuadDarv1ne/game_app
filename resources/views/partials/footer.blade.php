@@ -18,6 +18,7 @@
                 <div class="flex flex-col gap-2">
                     <a href="{{ route('posts.index') }}" class="text-xs font-mono text-zinc-400 hover:text-red-400 transition-colors">Посты</a>
                     <a href="{{ route('home') }}" class="text-xs font-mono text-zinc-400 hover:text-red-400 transition-colors">Главная</a>
+                    <a href="{{ route('posts.feed') }}" class="text-xs font-mono text-zinc-400 hover:text-red-400 transition-colors">RSS-лента</a>
                     @guest
                         <a href="{{ route('login') }}" class="text-xs font-mono text-zinc-400 hover:text-red-400 transition-colors">Войти</a>
                     @endguest

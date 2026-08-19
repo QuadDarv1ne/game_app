@@ -48,6 +48,8 @@
                 <span>[ {{ $post->category?->name ?? 'Без категории' }} ]</span>
                 <span class="text-zinc-700">•</span>
                 <span>Автор: {{ $post->user?->name ?? 'Аноним' }}</span>
+                <span class="text-zinc-700">•</span>
+                <span>👁 {{ number_format($post->views) }}</span>
             </div>
             <span>{{ $post->created_at->format('d.m.Y H:i') }}</span>
         </div>
@@ -125,6 +127,29 @@
                                     @livewire('toggle-comment-like', ['comment' => $comment])
                                     
                                     @if(auth()->id() === $comment->user_id)
+                                        <details class="relative group">
+                                            <summary class="list-none cursor-pointer text-zinc-600 hover:text-yellow-500 transition-all uppercase text-[9px] font-mono tracking-wider opacity-0 group-hover:opacity-100 group-hover/item:opacity-100">
+                                                [ Изменить ]
+                                            </summary>
+                                            <div class="absolute right-0 top-full mt-2 w-80 z-50 p-3 bg-zinc-950 border border-zinc-800 rounded-sm shadow-xl">
+                                                <form method="POST" action="{{ route('comments.update', $comment) }}" class="space-y-2">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <textarea
+                                                        name="content"
+                                                        rows="3"
+                                                        class="w-full bg-zinc-900 border border-zinc-800 rounded-sm p-2.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-red-600 resize-none"
+                                                        required
+                                                    >{{ $comment->content }}</textarea>
+                                                    <div class="flex justify-end gap-2">
+                                                        <button type="submit" class="text-[9px] font-mono text-yellow-500 hover:text-yellow-400 uppercase tracking-wider cursor-pointer bg-transparent border-none">
+                                                            [ Сохранить ]
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </details>
+
                                         <form method="POST" action="{{ route('comments.destroy', $comment) }}" onsubmit="return confirm('Удалить ваше сообщение?');">
                                             @csrf
                                             @method('DELETE')
@@ -153,7 +178,6 @@
                 <form action="{{ route('comments.store') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="hidden" name="post_id" value="{{ $post->id }}">
-                    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
                     <div class="flex flex-col gap-2">
                         <label class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">// Оставить сообщение</label>
@@ -209,7 +233,7 @@
                             </h3>
 
                             <p class="text-[10px] text-zinc-400 font-sans line-clamp-2">
-                                {{ Str::limit($similar->body, 100) }}
+                                {{ Str::limit(strip_tags($similar->body), 100) }}
                             </p>
 
                             <div class="pt-2 border-t border-zinc-950">

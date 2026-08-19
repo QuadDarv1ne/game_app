@@ -162,7 +162,7 @@
                         </div>
 
                         <p class="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-3">
-                            {{ Str::limit($post->body, 180) }}
+                            {{ Str::limit(strip_tags($post->body), 180) }}
                         </p>
 
                         <!-- Счётчики: комментарии и реакции -->
@@ -174,6 +174,10 @@
                             <span class="flex items-center gap-1">
                                 <span class="text-zinc-600">👍</span>
                                 <span>{{ $post->reactions_count ?? 0 }}</span>
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="text-zinc-600">👁</span>
+                                <span>{{ number_format($post->views) }}</span>
                             </span>
                         </div>
 

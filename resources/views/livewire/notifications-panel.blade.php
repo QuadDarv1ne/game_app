@@ -86,7 +86,7 @@
                                 </div>
                                 
                                 @if($notification->link)
-                                    <a href="{{ $notification->link }}" class="block text-[9px] font-mono text-red-500 hover:text-red-400 uppercase mt-1">
+                                    <a href="{{ route('notifications.open', $notification) }}" class="block text-[9px] font-mono text-red-500 hover:text-red-400 uppercase mt-1">
                                         [ Перейти ]
                                     </a>
                                 @endif

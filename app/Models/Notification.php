@@ -43,6 +43,7 @@ class Notification extends Model
             'dislike' => '👎',
             'comment' => '💬',
             'bookmark' => '⭐',
+            'post' => '📰',
             default => '🔔',
         };
     }

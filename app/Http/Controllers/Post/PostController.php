@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Subscription;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\AchievementService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -50,9 +53,9 @@ class PostController extends Controller
         match ($request->input('sort', 'latest')) {
             'popular' => $query->withCount(['bookmarks', 'reactions' => function ($q) {
                 $q->where('type', 'like');
-            }])->orderBy('bookmarks_count', 'desc'),
+            }])->orderByDesc('reactions_count')->orderByDesc('bookmarks_count'),
             'title' => $query->orderBy('title', 'asc'),
-            'reactions' => $query->withCount('reactions')->orderBy('reactions_count', 'desc'),
+            'reactions' => $query->withCount('reactions')->orderByDesc('reactions_count'),
             default => $query->latest(),
         };
 
@@ -82,6 +85,12 @@ class PostController extends Controller
             if ($request->has('tags')) {
                 $post->tags()->attach($request->tags);
             }
+
+            $notificationService = app(NotificationService::class);
+            $post->load('user');
+            $post->user->subscribers->each(function (Subscription $subscription) use ($notificationService, $post): void {
+                $notificationService->postPublished($post, $subscription->subscriber);
+            });
         });
 
         $user = User::withCount([
@@ -99,6 +108,8 @@ class PostController extends Controller
 
     public function show(Post $post): View
     {
+        $post->incrementViews();
+
         $post->load(['user', 'category', 'tags', 'comments.user']);
 
         $seoDescription = Str::limit(strip_tags($post->body), 160);
@@ -152,5 +163,17 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()->route('posts.index')->with('success', 'Пост успешно удален!');
+    }
+
+    public function feed(): Response
+    {
+        $posts = Post::with(['user', 'category'])
+            ->latest()
+            ->limit(20)
+            ->get();
+
+        return response()
+            ->view('pages.posts.feed', compact('posts'))
+            ->header('Content-Type', 'application/rss+xml; charset=utf-8');
     }
 }

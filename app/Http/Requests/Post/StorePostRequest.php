@@ -27,6 +27,8 @@ class StorePostRequest extends FormRequest
             'title' => ['required', 'string', 'max:500'],
             'description' => ['required', 'string', 'max:200'],
             'body' => ['required', 'string'],
+            'tags' => ['sometimes', 'array'],
+            'tags.*' => ['integer', 'exists:tags,id'],
         ];
     }
 }

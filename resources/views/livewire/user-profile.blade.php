@@ -135,7 +135,7 @@
                             </h2>
 
                             <p class="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-3">
-                                {{ Str::limit($post->body, 180) }}
+                                {{ Str::limit(strip_tags($post->body), 180) }}
                             </p>
 
                             @if($post->tags->isNotEmpty())
@@ -193,7 +193,7 @@
                             </div>
 
                             <p class="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-3">
-                                {{ Str::limit($post->body, 180) }}
+                                {{ Str::limit(strip_tags($post->body), 180) }}
                             </p>
                         </div>
 
@@ -241,7 +241,7 @@
                             </div>
 
                             <p class="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-3">
-                                {{ Str::limit($post->body, 180) }}
+                                {{ Str::limit(strip_tags($post->body), 180) }}
                             </p>
                         </div>
 
